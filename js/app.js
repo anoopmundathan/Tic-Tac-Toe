@@ -1,90 +1,150 @@
-	var combination = [
-		[1,2,3],
-		[4,5,6],
-		[7,8,9],
-		[1,4,7],
-		[2,5,8],
-		[3,6,9],
-		[1,5,9],
-		[3,5,7]	
-	];
 
-	var state = 0;
-	var boxArray1 = [];
-	var boxArray2 = [];
+(function () {
 
-	var startScreen = '<div class="screen screen-start" id="start"><header><h1>Tic Tac Toe</h1><a href="#" class="button">Start game</a></header></div>';
+	// Set variables for start and end screens
+	var startUpScreen = '<div class="screen screen-start" id="start"><header><h1>Tic Tac Toe</h1><a href="#" class="button">Start game</a></header></div>';
 	var winScreen = '<div class="screen screen-win" id="finish"><header><h1>Tic Tac Toe</h1><p class="message"></p><a href="#" class="button">New game</a></header></div>';
-	// Show start screen
-	$('.board').hide();
-	$('body').prepend(startScreen);
+	
+	var playerOne = $('#player1');
+	var playerTwo = $('#player2');
+	var winner = "";
 
-	// Display game screen when user click start button
+	// When the page loads, show start game screen, hide board and finish screen
+	$('body').append(startUpScreen);
+	$('#board').hide();
+	$('body').append(winScreen);
+	$('#finish').hide();
+	
+	// Start game button click event handler
 	$('.button').click(function() {
-		$('.screen-start').hide();
-		$('.board').show();
-		$('#player1').addClass('active');
+		$('#start').hide();
+		$('#finish').hide();
+		$('#board').show();
+
+		playerTwo.removeClass('active');
+		$('.box').each(function() {
+			$(this).removeClass('box-filled-1');
+			$(this).removeClass('box-filled-2');
+			$(this).css('background-image', '');
+	
+			$(this).mouseover(function() {
+				if (playerOne.hasClass('active')) {
+					$(this).css('background-image', "url('./img/o.svg')");
+					// this.style.backgroundImage = "url('img/o.svg')";
+				} else {
+					$(this).css('background-image', "url('./img/x.svg')");
+					// this.style.backgroundImage = "url('img/o.svg')";
+				}
+			});
+
+			$(this).mouseleave(function() {
+				$(this).css('background-image', '');
+			})
+
+		});
+
+		playerOne.addClass('active');
 	});
 
-	$('.box').hover(function() {
-		if (state===1) {
-			$(this).toggleClass('box-filled-2');
-		} else {
-			$(this).toggleClass('box-filled-1');
-		}
-		
-	});
-
+	// Each box click event handler 
 	$('.box').click(function() {
-		if (state === 0) {
-			$(this).toggleClass('box-notactive-1');
-			$('#player1').removeClass('active');
-			$('#player2').addClass('active');
-			boxArray1.push(parseInt($(this).attr('id')));
-			state = 1;
-			checkCombination();
 
-		} else {
-			$(this).toggleClass('box-notactive-2');
-			$('#player1').addClass('active');
-			$('#player2').removeClass('active');
-			boxArray2.push(parseInt($(this).attr('id')));
-			state = 0;
-			checkCombination();
+		if(playerOne.hasClass('active')) {
+
+			if ($(this).hasClass('box-filled-1') === false && $(this).hasClass('box-filled-2') === false) {
+				$(this).addClass('box-filled-1');
+				playerOne.removeClass('active');
+				playerTwo.addClass('active');
+				$(this).unbind('mouseover mouseleave');
+				checkGame();
+			}
+			
+		} else if(playerTwo.hasClass('active')) {
+
+			if ($(this).hasClass('box-filled-1') === false && $(this).hasClass('box-filled-2') === false) {
+				$(this).addClass('box-filled-2');
+				playerTwo.removeClass('active');
+				playerOne.addClass('active');
+				$(this).unbind('mouseover mouseleave');
+				checkGame();
+			}
 		}
+
+		function checkGame() {
+
+			var boxArray = [];
+			$('.box').each(function() {
+				if($(this).hasClass('box-filled-1') === true) {
+					boxArray.push('player1');
+				} else if ($(this).hasClass('box-filled-2') === true) {
+					boxArray.push('player2');
+				} else {
+					boxArray.push('null');
+				}
+			})	
+			
+			if (boxArray[0]!== 'null' && boxArray[0] === boxArray[1] && boxArray[1] === boxArray[2]) {
+				winner = boxArray[0];
+				showGameStatus();
+
+			} else if (boxArray[3]!== 'null' && boxArray[3] === boxArray[4] && boxArray[4] === boxArray[5]) {
+				winner = boxArray[3];
+				showGameStatus();
+
+			} else if (boxArray[6]!== 'null' && boxArray[6] === boxArray[7] && boxArray[7] === boxArray[8]) {
+				winner = boxArray[6];
+				showGameStatus();
+
+			} else if (boxArray[0]!== 'null' && boxArray[0] === boxArray[3] && boxArray[3] === boxArray[6]) {
+				winner = boxArray[0];
+				showGameStatus();
+
+			} else if (boxArray[1]!== 'null' && boxArray[1] === boxArray[4] && boxArray[4] === boxArray[7]) {
+				winner = boxArray[1];
+				showGameStatus();
+
+			} else if (boxArray[2]!== 'null' && boxArray[2] === boxArray[5] && boxArray[5] === boxArray[8]) {
+				winner = boxArray[2];
+				showGameStatus();
+
+			} else if (boxArray[0]!== 'null' && boxArray[0] === boxArray[4] && boxArray[4] === boxArray[8]) {
+				winner = boxArray[0];
+				showGameStatus();
+
+			} else if (boxArray[2]!== 'null' && boxArray[2] === boxArray[4] && boxArray[4] === boxArray[6]) {
+				winner = boxArray[2];
+				showGameStatus();
+
+			} else if (boxArray.includes('null') === false) {
+				winner = "tie";
+				showGameStatus();
+			}
 		
-	});
-
-	var player1Combination;
-	var player2Combination;
-
-	function checkCombination() {
-
-		player1Combination = boxArray1.join('|');
-		player2Combination = boxArray2.join('|');
-		
-		var length = combination.length;
-
-		for (var i=0; i < boxArray1.length; i++) {
-			for (var j=0; j < length; j++) {
-				for(var k=0; k < 3; k++) {
-					if (boxArray1[i] === combination[j][k]) {
-
-					}
+			function showGameStatus() {
+				if (winner === "player1") {
+					$("#finish").removeClass("screen-win-two");
+					$("#finish").removeClass("screen-win-tie");
+					$(".message").html("Player 1 wins!");
+					$("#finish").addClass("screen-win-one");
+					$("#finish").show();
+					$("#board").hide();
+				} else if (winner === "player2") {
+					$("#finish").removeClass("screen-win-one");
+					$("#finish").removeClass("screen-win-tie");
+					$(".message").html("Player 2 wins!");
+					$("#finish").addClass("screen-win-two");
+					$("#finish").show();
+					$("#board").hide();
+				} else if (winner === "tie") {
+					$("#finish").removeClass("screen-win-one");
+					$("#finish").removeClass("screen-win-two");
+					$(".message").html("It's a Tie!");
+					$("#finish").addClass("screen-win-tie");
+					$("#finish").show();
+					$("#board").hide();
 				}
 			}
-		}
-			/*if (player1Combination === combination[i].sort().join('|')) {
-				//$('.board').hide();
-				//$('body').append(winScreen);
-				console.log('matched');
+		};
+	});
 
-			}
-			if (player2Combination === combination[i].sort().join('|')) {
-				// $('.board').hide();
-				// $('body').append(winScreen);
-				console.log('matched2');
-			}*/
-	}
-
-	
+}());

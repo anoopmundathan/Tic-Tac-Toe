@@ -184,26 +184,20 @@ h1 {
   background-repeat: no-repeat;
   background-position: center center;
 }
+
 .boxes .box:nth-child(3n) {
   margin-right: 0; 
 }
+
 .boxes .box-filled-1 {
   background-color: #FFA000;
   background-image: url(../img/o.svg); 
 }
+
 .boxes .box-filled-2 {
   background-color: #3688C3;
   background-image: url(../img/x.svg); 
 }
 
-.boxes .box-notactive-1 {
-  background-color: #FFA000;
-  background-image: url(../img/o.svg); 
-}
-
-.boxes .box-notactive-2 {
-  background-color: #3688C3;
-  background-image: url(../img/x.svg); 
-}
 
 
