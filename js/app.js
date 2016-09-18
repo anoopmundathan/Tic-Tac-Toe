@@ -21,58 +21,76 @@
 		$('#finish').hide();
 		$('#board').show();
 
-		playerTwo.removeClass('active');
+		
+
 		$('.box').each(function() {
 			$(this).removeClass('box-filled-1');
 			$(this).removeClass('box-filled-2');
 			$(this).css('background-image', '');
 	
+			// When the current player mouses over an empty square on the board, 
+			// it's symbol the X or O should appear on the square.
 			$(this).mouseover(function() {
 				if (playerOne.hasClass('active')) {
 					$(this).css('background-image', "url('./img/o.svg')");
-					// this.style.backgroundImage = "url('img/o.svg')";
 				} else {
 					$(this).css('background-image', "url('./img/x.svg')");
-					// this.style.backgroundImage = "url('img/o.svg')";
 				}
 			});
 
+			// Remove background image when mouse leaves out
 			$(this).mouseleave(function() {
 				$(this).css('background-image', '');
 			})
 
 		});
 
+		playerTwo.removeClass('active');
+		
+		// Start game with player one 
 		playerOne.addClass('active');
 	});
 
-	// Each box click event handler 
+	// Click event handling for each boxes
 	$('.box').click(function() {
 
-		if(playerOne.hasClass('active')) {
-
 			if ($(this).hasClass('box-filled-1') === false && $(this).hasClass('box-filled-2') === false) {
+
+				if(playerOne.hasClass('active')) {
+
+					// Bind the current this context
+					checkGame.call(this,'p1');
+				} else {
+
+					// Bind the current this context
+					checkGame.call(this,'p2');
+				}
+			}
+	
+		/**
+		 * function : checkGame
+		 * @param - player - which player clicked
+		 */
+		function checkGame(player) {
+
+			var boxArray = [];
+
+			// Players can only click on empty squares. When the player clicks on an empty square, 
+			// attach the class box-filled-1 (for O) or box-filled-2 (for X) to the square. 
+			if (player === 'p1') {
 				$(this).addClass('box-filled-1');
 				playerOne.removeClass('active');
 				playerTwo.addClass('active');
-				$(this).unbind('mouseover mouseleave');
-				checkGame();
-			}
-			
-		} else if(playerTwo.hasClass('active')) {
-
-			if ($(this).hasClass('box-filled-1') === false && $(this).hasClass('box-filled-2') === false) {
+			} else if (player === 'p2') {
 				$(this).addClass('box-filled-2');
 				playerTwo.removeClass('active');
 				playerOne.addClass('active');
-				$(this).unbind('mouseover mouseleave');
-				checkGame();
 			}
-		}
 
-		function checkGame() {
+			// Detach event handler once box is clicked
+			$(this).unbind('mouseover mouseleave');
 
-			var boxArray = [];
+			// boxArray will be used to calculate the winner
 			$('.box').each(function() {
 				if($(this).hasClass('box-filled-1') === true) {
 					boxArray.push('player1');
@@ -83,6 +101,8 @@
 				}
 			})	
 			
+	
+			// The game ends when one player has three of their symbols in a row either horizontally, vertically or diagonally. 
 			if (boxArray[0]!== 'null' && boxArray[0] === boxArray[1] && boxArray[1] === boxArray[2]) {
 				winner = boxArray[0];
 				showGameStatus();
@@ -115,35 +135,40 @@
 				winner = boxArray[2];
 				showGameStatus();
 
+			// If all of the squares are filled and no players have three in a row the game is a tie.
 			} else if (boxArray.includes('null') === false) {
 				winner = "tie";
 				showGameStatus();
 			}
 		
+			// When the game ends, the board disappear and the game end screen appears
 			function showGameStatus() {
+				// Player1 winning screen
 				if (winner === "player1") {
 					$("#finish").removeClass("screen-win-two");
 					$("#finish").removeClass("screen-win-tie");
 					$(".message").html("Player 1 wins!");
 					$("#finish").addClass("screen-win-one");
-					$("#finish").show();
-					$("#board").hide();
+					
+				// Player2 winning screen
 				} else if (winner === "player2") {
 					$("#finish").removeClass("screen-win-one");
 					$("#finish").removeClass("screen-win-tie");
 					$(".message").html("Player 2 wins!");
 					$("#finish").addClass("screen-win-two");
-					$("#finish").show();
-					$("#board").hide();
+
+				// Game tie screen
 				} else if (winner === "tie") {
 					$("#finish").removeClass("screen-win-one");
 					$("#finish").removeClass("screen-win-two");
 					$(".message").html("It's a Tie!");
 					$("#finish").addClass("screen-win-tie");
-					$("#finish").show();
-					$("#board").hide();
 				}
+
+				$("#finish").show();
+				$("#board").hide();
 			}
+
 		};
 	});
 
